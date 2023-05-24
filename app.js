@@ -4,11 +4,20 @@ const { readFileSync, writeFileSync } = require('fs');
 const app = express();
 const filePath = './data/users.json' 
 
+// middlewares
 app.use(express.json()) // for parsing application/json
 app.use(express.static('static')) // serve static html files
 
-app.get('/', (req, res) => {
-  
+app.set('view engine', 'ejs')
+
+app.get('/dashboard', (req, res) => {
+  res.render('index', {
+    name: 'Denda'
+  })
+});
+
+app.get('/foobar', (req, res) => {
+  res.sendFile('static/foobar.html', {root: __dirname });
 });
 
 app.post('/auth', (req, res) => {
@@ -25,12 +34,11 @@ app.post('/auth', (req, res) => {
   const users = usersJson.users;
 
   if (users.find((user) => username === user.username && password === user.password)) {
-    res.send({
+    res.status(200).json({
       message: 'OK',
     });
   }
-  res.send({
-    status: 404,
+  res.status(404).json({
     message: 'Invalid username or password',
   });
 });
@@ -46,9 +54,11 @@ app.post('/register', (req, res) => {
   const data = readFileSync(filePath);
   const usersJson = JSON.parse(data);
   const users = usersJson.users;
+
   if (users.find((user) => username === user.username)) {
-    res.statusCode = 409 // conflict
-    res.send({message:'Username already taken, create another one'});
+    res.status(409).json( // conflict
+      {message:'Username already taken, create another one'} 
+      );
   } else {
     const newUserObj = {
       username:username,
