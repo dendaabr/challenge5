@@ -1,42 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
+<%- include('./partials/head'); %>
+    <%- include('./partials/header'); %>
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="assets/icon.ico">
-    <title>Binar Academy Challenge -3</title>
-</head>
-
-<body>
-    <nav>
-        <span id="logo">LOGO</span>
-        <div class="menu">
-            <span>HOME</span>
-            <span>WORK</span>
-            <span>CONTACT</span>
-            <span>ABOUT ME</span>
-        </div>
-        <div class="signuplogin">
-            <span>SIGN UP</span>
-            <span>LOGIN</span>
-        </div>
-
-    </nav>
-    <main>
         <section class="title">
             <div id="titlegame">PLAY TRADITIONAL GAME
                 <p>Experiance new traditional game play</p>
                 <div>
-                    <button class="btn">PLAY NOW</button>
+                    <a href="/rock-paper-scissor">
+                        <button class="btn" onclick="">PLAY NOW</button>
+                    </a>
                 </div>
             </div>
             <div id="thestory">THE STORY
@@ -51,7 +22,8 @@
 
             <span class="slideshow-about">
                 <div class="mySlides fade">
-                    <img src="assets/rockpaperstrategy-1600.jpg" width="700px" height="400px">
+                    <img src="assets/rockpaperstrategy-1600.jpg"
+                            width="700px" height="400px">
                 </div>
                 <div class="mySlides fade">
                     <img src="assets/jada-griffin.jpg" width="700px" height="400px">
@@ -201,57 +173,5 @@
                 </div>
             </div>
         </section>
-        <footer class="footer">
-            <div class="footercontent">
-                <div class="footerlink">
-                    <span><a href="#titlegame">home</a></span>
-                    <span><a href="#about">about</a></span>
-                    <span><a href="#feature">game features</a></span>
-                    <span><a href="#sq">System requirements</a></span>
-                    <span><a href="#quotes">quotes</a></span>
-                    <span><a href="https://www.twitter.com/"><img src="assets/twitter.svg"></a></span>
-                    <span><a href="https://www.facebook.com/"><img src="assets/facebook.svg"></a></span>
-                    <span><a href="https://www.youtube.com/"><img src="assets/vector.svg"></a></span>
-                    <span><a href="#"><img src="assets/twitch.svg"></a></span>
 
-                </div>
-            </div>
-            <div class="linefooter">
-                <div class="copyright">@2022 Your Games, Inc. All Right Reserved</div>
-                <div class="copyright">Privacy Policy | Terms of Services | Code of Conduct</div>
-            </div>
-        </footer>
-    </main>
-    <script>
-        let slideIndex = 1;
-        showSlides(slideIndex);
-
-        function plusSlides(n) {
-            showSlides(slideIndex += n);
-        }
-
-        function currentSlide(n) {
-            showSlides(slideIndex = n);
-        }
-
-        function showSlides(n) {
-            let i;
-            let slides = document.getElementsByClassName("mySlides");
-            let dots = document.getElementsByClassName("dot");
-            if (n > slides.length) { slideIndex = 1 }
-            if (n < 1) { slideIndex = slides.length }
-            for (i = 0; i < slides.length; i++) {
-                slides[i].style.display = "none";
-            }
-            for (i = 0; i < dots.length; i++) {
-                dots[i].className = dots[i].className.replace(" active", "");
-            }
-            slides[slideIndex - 1].style.display = "block";
-            dots[slideIndex - 1].className += " active";
-        }
-    </script>
-
-</body>
-
-
-</html>
+        <%- include('./partials/footer'); %>

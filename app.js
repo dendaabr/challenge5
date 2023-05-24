@@ -1,38 +1,91 @@
 const express = require('express');
+const session = require('express-session');
 const { readFileSync, writeFileSync } = require('fs');
+const bodyParser = require('body-parser');
+const { get } = require('lodash');
 
 const app = express();
 const filePath = './data/users.json' 
 
+// middlewares
 app.use(express.json()) // for parsing application/json
-app.use(express.static('static')) // serve static html files
+app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+  extended: true
+})); 
+app.use(express.static('static')) // serve static files
+
+app.set('view engine', 'ejs')
+
+app.set('trust proxy', 1) // trust first proxy
+app.use(session({  
+  name: `challenge5`,
+  secret: 'secret1234',  
+  resave: false,
+  saveUninitialized: false,
+  cookie: { 
+    secure: false, // This will only work if you have https enabled!
+    maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
+  } 
+}));
+
+const sessionChecker = (req, res, next) => {    
+  console.log(`Session Checker: ${req.session.id}`.green);
+  console.log(req.session);
+  if (req.session.profile) {
+      console.log(`Found User Session`.green);
+      next();
+  } else {
+      console.log(`No User Session Found`.red);
+      res.redirect('/login');
+  }
+};
 
 app.get('/', (req, res) => {
-  
+  res.render('index', {
+    username: get(req,'session.profile.username')
+  })
 });
 
-app.post('/auth', (req, res) => {
-  const header = req.headers.authorization || '';
-  const token = header.split(/\s+/).pop() || '';
-  const auth = Buffer.from(token, 'base64').toString();
-  const parts = auth.split(/:/);
-  const username = parts.shift();
-  const password = parts.join(':');
-  
+app.get('/works', (req, res) => {
+  const data = readFileSync('./data/works.json');
+  const works = JSON.parse(data);
+  res.json(works)
+});
+
+app.get('/login', (req, res) => {
+  res.render('login')
+});
+
+app.get('/signup', (req, res) => {
+  res.render('signup')
+});
+
+app.get('/rock-paper-scissor', sessionChecker, (req, res) => {
+  res.render('rock-paper-scissor', {
+    username: get(req,'session.profile.username')
+  })
+});
+
+app.post('/login', (req, res) => {
+
+  const {username, password} = req.body;
   
   const data = readFileSync(filePath);
   const usersJson = JSON.parse(data);
   const users = usersJson.users;
 
   if (users.find((user) => username === user.username && password === user.password)) {
-    res.send({
-      message: 'OK',
+    req.session.profile = {
+      username: username
+    };
+    res.render('index', {
+      username: username,
+    });
+  } else {
+    res.render('login', {
+      errMsg: 'Invalid username or password',
     });
   }
-  res.send({
-    status: 404,
-    message: 'Invalid username or password',
-  });
 });
 
 app.post('/register', (req, res) => {
@@ -46,9 +99,12 @@ app.post('/register', (req, res) => {
   const data = readFileSync(filePath);
   const usersJson = JSON.parse(data);
   const users = usersJson.users;
+
   if (users.find((user) => username === user.username)) {
-    res.statusCode = 409 // conflict
-    res.send({message:'Username already taken, create another one'});
+    res.render('signup',
+    {
+      errMsg:'Username already taken, create another one'
+    });
   } else {
     const newUserObj = {
       username:username,
@@ -65,9 +121,17 @@ app.post('/register', (req, res) => {
       console.log('An error has occurred ', error);
     }
   
-    res.statusCode = 201; // created
-    res.send({message:'Yay. You are successfully registered.'})
+    res.render('signup-success');
   }
 });
+
+app.get('/logout', (req, res) => {
+  req.session.destroy(function(err) {
+    console.log('Destroyed session')
+  })
+  res.redirect('/');
+});
+
+ 
 
 app.listen(3000);
