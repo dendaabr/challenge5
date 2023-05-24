@@ -46,6 +46,12 @@ app.get('/', (req, res) => {
   })
 });
 
+app.get('/works', (req, res) => {
+  const data = readFileSync('./data/works.json');
+  const works = JSON.parse(data);
+  res.json(works)
+});
+
 app.get('/login', (req, res) => {
   res.render('login')
 });
