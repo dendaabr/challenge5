@@ -12,7 +12,7 @@ app.use(express.json()) // for parsing application/json
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
 })); 
-app.use(express.static('static')) // serve static html files
+app.use(express.static('static')) // serve static files
 
 app.set('view engine', 'ejs')
 
@@ -46,28 +46,18 @@ app.get('/', (req, res) => {
   })
 });
 
-app.get('/work', (req, res) => {
-  res.render('work')
-});
-
-app.get('/contact', (req, res) => {
-  res.render('contact')
-});
-
-app.get('/about', (req, res) => {
-  res.render('about')
-});
-
 app.get('/login', (req, res) => {
-  res.render('login', {
-    error: {
-      message: ""
-    }
-  })
+  res.render('login')
 });
 
 app.get('/signup', (req, res) => {
   res.render('signup')
+});
+
+app.get('/rock-paper-scissor', sessionChecker, (req, res) => {
+  res.render('rock-paper-scissor', {
+    username: get(req,'session.profile.username')
+  })
 });
 
 app.post('/login', (req, res) => {
@@ -105,9 +95,10 @@ app.post('/register', (req, res) => {
   const users = usersJson.users;
 
   if (users.find((user) => username === user.username)) {
-    res.status(409).json( // conflict
-      {message:'Username already taken, create another one'} 
-      );
+    res.render('signup',
+    {
+      errMsg:'Username already taken, create another one'
+    });
   } else {
     const newUserObj = {
       username:username,
@@ -124,8 +115,7 @@ app.post('/register', (req, res) => {
       console.log('An error has occurred ', error);
     }
   
-    res.statusCode = 201; // created
-    res.send({message:'Yay. You are successfully registered.'})
+    res.render('signup-success');
   }
 });
 
